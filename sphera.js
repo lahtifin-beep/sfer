@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>3D Панорама</title>
+    <style>
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; }
+        #viewer { width: 100%; height: 100%; position: absolute; top:0; left:0; }
+    </style>
+    <script src="sphera.js"></script>
+</head>
+<body>
+    <div id="viewer"></div>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new PanoramaViewer({
+                container: document.getElementById('viewer'),
+                image: 'pano.jpg'
+            });
+        });
+    </script>
+</body>
+</html>
