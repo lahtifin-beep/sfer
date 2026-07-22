@@ -3,29 +3,28 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>3D Панорама проекта</title>
-    <!-- Безопасное подключение официальной библиотеки для сферических панорам -->
-    <link rel="stylesheet" href="https://jsdelivr.net" />
-    <script src="https://jsdelivr.net"></script>
-    <script src="https://jsdelivr.net"></script>
+    <title>3D Панорама</title>
+    <!-- Подключение надежного мирового плеера панорам -->
+    <link rel="stylesheet" href="https://cloudflare.com" />
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
     <style>
         html, body, #viewer { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; }
     </style>
 </head>
 <body>
 
-    <!-- Сюда выведется панорама -->
     <div id="viewer"></div>
 
     <script>
-        // Инициализация сферического плеера
+        // Запуск панорамы из одной сферической картинки
         const viewer = new PhotoSphereViewer.Viewer({
             container: document.getElementById('viewer'),
-            panorama: 'pano.jpg', // Имя вашей загруженной картинки
-            defaultMinFov: 30,    // Ограничение приближения
-            defaultMaxFov: 90,    // Ограничение отдаления
-            defaultFov: 70,       // Стартовый обзор комнаты
-            navbar: false         // Скрываем лишние кнопки снизу
+            panorama: 'pano.jpg', 
+            defaultMinFov: 30,    
+            defaultMaxFov: 90,    
+            defaultFov: 70,       
+            navbar: false         
         });
     </script>
 </body>
