@@ -4,27 +4,26 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>3D Панорама</title>
-    <!-- Подключение надежного мирового плеера панорам -->
-    <link rel="stylesheet" href="https://cloudflare.com" />
-    <script src="https://cloudflare.com"></script>
-    <script src="https://cloudflare.com"></script>
     <style>
-        html, body, #viewer { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; }
+        #viewer { width: 100%; height: 100%; position: absolute; top:0; left:0; }
     </style>
+    <!-- Подключаем ваш файл sphera.js -->
+    <script src="sphera.js"></script>
 </head>
 <body>
-
     <div id="viewer"></div>
-
     <script>
-        // Запуск панорамы из одной сферической картинки
-        const viewer = new PhotoSphereViewer.Viewer({
-            container: document.getElementById('viewer'),
-            panorama: 'pano.jpg', 
-            defaultMinFov: 30,    
-            defaultMaxFov: 90,    
-            defaultFov: 70,       
-            navbar: false         
+        window.addEventListener('DOMContentLoaded', () => {
+            // Запуск нашего нового автономного плеера
+            if (typeof PanoramaViewer !== 'undefined') {
+                new PanoramaViewer({
+                    container: document.getElementById('viewer'),
+                    image: 'pano.jpg'
+                });
+            } else {
+                document.body.innerHTML = "<div style='color:white;text-align:center;padding:20px;'>Файл sphera.js еще не загрузился или пустой.</div>";
+            }
         });
     </script>
 </body>
