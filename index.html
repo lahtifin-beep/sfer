@@ -8,17 +8,41 @@
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; }
         #viewer { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
     </style>
-    <!-- Подключаем ваш полностью автономный файл движка -->
+    <!-- Подключаем ваш полностью автономный движок из репозитория -->
     <script src="sphera.js"></script>
 </head>
 <body>
+
     <div id="viewer"></div>
+
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            new PanoramaViewer({
-                container: document.getElementById('viewer'),
-                image: 'pano.jpg'
-            });
+            // По умолчанию открываем базовый файл pano.jpg
+            let imageName = 'pano.jpg'; 
+            
+            // Проверяем, передано ли имя файла в ссылку (например, ?p=Pano23.png)
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectParam = urlParams.get('p');
+            
+            if (projectParam) {
+                // Если расширение файла (.png или .jpg) указано, берем его как есть
+                if (projectParam.includes('.')) {
+                    imageName = projectParam;
+                } else {
+                    // Если расширение забыли дописать, по умолчанию считаем его .jpg
+                    imageName = projectParam + '.jpg';
+                }
+            }
+
+            // Запуск вашего автономного 3D-плеера панорам
+            if (typeof PanoramaViewer !== 'undefined') {
+                new PanoramaViewer({
+                    container: document.getElementById('viewer'),
+                    image: imageName
+                });
+            } else {
+                document.body.innerHTML = "<div style='color:white;text-align:center;padding:20px;'>Ошибка: файл движка sphera.js не найден или пустой.</div>";
+            }
         });
     </script>
 </body>
