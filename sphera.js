@@ -3,13 +3,12 @@ class PanoramaViewer {
         this.container = options.container;
         this.imageSrc = options.image;
 
-        // Создаем встроенный легкий 3D-движок на чистом WebGL
         this.canvas = document.createElement('canvas');
         this.container.appendChild(this.canvas);
         this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
 
         if (!this.gl) {
-            this.container.innerHTML = "<div style='color:white;text-align:center;padding:20px;'>WebGL не поддерживается вашим браузером.</div>";
+            this.container.innerHTML = "<div style='color:white;text-align:center;padding:20px;'>WebGL не поддерживается браузером.</div>";
             return;
         }
 
@@ -27,13 +26,27 @@ class PanoramaViewer {
         this.resize();
         window.addEventListener('resize', () => this.resize());
 
-        // Простая и надежная компиляция 3D-шейдеров сферы
+        // Шейдеры с учётом пропорций экрана (aspect) для исправления растянутости размеров
         const vs = `attribute vec3 p; varying vec3 v; void main() { v = p; gl_Position = vec4(p.x, p.y, 1.0, 1.0); }`;
-        const fs = `precision mediump float; uniform sampler2D t; uniform vec2 r; uniform vec2 rot; varying vec3 v;
+        const fs = `precision mediump float; uniform sampler2D t; uniform vec2 aspect; uniform vec2 rot; varying vec3 v;
             void main() {
-                float lon = v.x * 3.1415926 + rot.x; float lat = v.y * 1.5707963 + rot.y;
-                vec3 d = vec3(cos(lat)*sin(lon), sin(lat), cos(lat)*cos(lon));
-                float pLon = atan(d.x, d.z); float pLat = asin(d.y);
+                // Вычисляем угол обзора с учётом ширины и высоты экрана ноутбука/телефона
+                float fov = 1.0; 
+                vec3 d = vec3(v.x * aspect.x * fov, v.y * aspect.y * fov, 1.0);
+                d = normalize(d);
+                
+                // Вращение камеры вокруг осей
+                float sinX = sin(rot.y); float cosX = cos(rot.y);
+                float sinY = sin(rot.x); float cosY = cos(rot.x);
+                
+                vec3 r;
+                r.x = d.x * cosY + (d.y * sinX - d.z * cosX) * sinY;
+                r.y = d.y * cosX + d.z * sinX;
+                r.z = -d.x * sinY + (d.y * sinX - d.z * cosX) * cosY;
+                r = normalize(r);
+                
+                // Перевод в сферические координаты панорамы Ceramic 3D
+                float pLon = atan(r.x, r.z); float pLat = asin(r.y);
                 vec2 uv = vec2((pLon + 3.1415926) / 6.2831852, (1.5707963 - pLat) / 3.1415926);
                 gl_FragColor = texture2D(t, uv);
             }`;
@@ -64,6 +77,7 @@ class PanoramaViewer {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
 
         this.rotLoc = this.gl.getUniformLocation(this.prog, "rot");
+        this.aspLoc = this.gl.getUniformLocation(this.prog, "aspect");
 
         this.container.addEventListener('pointerdown', (e) => {
             this.isUserInteracting = true; this.startX = e.clientX; this.startY = e.clientY;
@@ -71,9 +85,9 @@ class PanoramaViewer {
         });
         window.addEventListener('pointermove', (e) => {
             if (!this.isUserInteracting) return;
-            // Управление обзором с идеальными пропорциями и скоростью
-            this.lon = this.startLon - (e.clientX - this.startX) * 0.005;
-            this.lat = this.startLat + (e.clientY - this.startY) * 0.005;
+            // Плавное вращение по осям
+            this.lon = this.startLon + (e.clientX - this.startX) * 0.003;
+            this.lat = this.startLat + (e.clientY - this.startY) * 0.003;
             this.lat = Math.max(-1.4, Math.min(1.4, this.lat));
         });
         window.addEventListener('pointerup', () => this.isUserInteracting = false);
@@ -85,10 +99,15 @@ class PanoramaViewer {
         this.canvas.width = this.container.clientWidth;
         this.canvas.height = this.container.clientHeight;
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Вычисляем правильное соотношение сторон экрана ноутбука/смартфона
+        this.aspectX = this.canvas.width / this.canvas.height;
+        this.aspectY = 1.0;
     }
 
     render() {
         requestAnimationFrame(() => this.render());
+        this.gl.uniform2f(this.aspLoc, this.aspectX, this.aspectY);
         this.gl.uniform2f(this.rotLoc, this.lon, this.lat);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
     }
