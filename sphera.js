@@ -87,8 +87,8 @@ class PanoramaViewer {
         window.addEventListener('pointermove', (e) => {
             if (!this.isUserInteracting) return;
             // Плавное вращение по осям
-            this.lon = this.startLon + (e.clientX - this.startX) * 0.003;
-            this.lat = this.startLat + (e.clientY - this.startY) * 0.003;
+            this.lon = this.startLon - (e.clientX - this.startX) * 0.003;
+            this.lat = this.startLat - (e.clientY - this.startY) * 0.003;
             this.lat = Math.max(-1.4, Math.min(1.4, this.lat));
         });
         window.addEventListener('pointerup', () => this.isUserInteracting = false);
