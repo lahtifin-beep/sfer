@@ -4,29 +4,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>3D Панорама</title>
-    <!-- Используем зеркало библиотек от Яндекса и Cloudflare, которые работают везде без сбоев -->
-    <link rel="stylesheet" href="https://yastatic.net" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
-    <script src="https://cloudflare.com"></script>
-    <script src="https://cloudflare.com"></script>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #000; }
-        #viewer-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        #viewer { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
     </style>
+    <!-- Подключаем ваш полностью автономный файл движка -->
+    <script src="sphera.js"></script>
 </head>
 <body>
-
-    <!-- Контейнер для правильного 3D отображения -->
-    <div id="viewer-container"></div>
-
+    <div id="viewer"></div>
     <script>
-        // Создаем правильную 3D-сферу для панорамы
-        const panorama = new PANOLENS.ImagePanorama('pano.jpg');
-        const viewer = new PANOLENS.Viewer({
-            container: document.getElementById('viewer-container'),
-            controlBar: false,     // Отключаем нижнюю панель
-            autoHideInfospot: true // Прячем лишние элементы
+        window.addEventListener('DOMContentLoaded', () => {
+            new PanoramaViewer({
+                container: document.getElementById('viewer'),
+                image: 'pano.jpg'
+            });
         });
-        viewer.add(panorama);
     </script>
 </body>
 </html>
