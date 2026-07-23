@@ -31,7 +31,7 @@ class PanoramaViewer {
         const fs = `precision mediump float; uniform sampler2D t; uniform vec2 aspect; uniform vec2 rot; varying vec3 v;
             void main() {
                 // Вычисляем угол обзора с учётом ширины и высоты экрана ноутбука/телефона
-                float fov = 1.0; 
+                float fov = 0.8; 
                 vec3 d = vec3(v.x * aspect.x * fov, v.y * aspect.y * fov, 1.0);
                 d = normalize(d);
                 d.x = -d.x;
