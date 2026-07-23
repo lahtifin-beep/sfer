@@ -34,7 +34,8 @@ class PanoramaViewer {
                 float fov = 1.0; 
                 vec3 d = vec3(v.x * aspect.x * fov, v.y * aspect.y * fov, 1.0);
                 d = normalize(d);
-                
+                d.x = -d.x;
+
                 // Вращение камеры вокруг осей
                 float sinX = sin(rot.y); float cosX = cos(rot.y);
                 float sinY = sin(rot.x); float cosY = cos(rot.x);
