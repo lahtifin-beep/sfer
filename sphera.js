@@ -26,17 +26,16 @@ class PanoramaViewer {
         this.resize();
         window.addEventListener('resize', () => this.resize());
 
-        // Шейдеры с учётом пропорций экрана (aspect) для исправления растянутости размеров
         const vs = `attribute vec3 p; varying vec3 v; void main() { v = p; gl_Position = vec4(p.x, p.y, 1.0, 1.0); }`;
         const fs = `precision mediump float; uniform sampler2D t; uniform vec2 aspect; uniform vec2 rot; varying vec3 v;
             void main() {
-                // Вычисляем угол обзора с учётом ширины и высоты экрана ноутбука/телефона
-                float fov = 0.8; 
+                float fov = 1.0; 
                 vec3 d = vec3(v.x * aspect.x * fov, v.y * aspect.y * fov, 1.0);
                 d = normalize(d);
+                
+                // Фиксация отзеркаливания панорамы Ceramic 3D
                 d.x = -d.x;
-
-                // Вращение камеры вокруг осей
+                
                 float sinX = sin(rot.y); float cosX = cos(rot.y);
                 float sinY = sin(rot.x); float cosY = cos(rot.x);
                 
@@ -46,7 +45,6 @@ class PanoramaViewer {
                 r.z = -d.x * sinY + (d.y * sinX - d.z * cosX) * cosY;
                 r = normalize(r);
                 
-                // Перевод в сферические координаты панорамы Ceramic 3D
                 float pLon = atan(r.x, r.z); float pLat = asin(r.y);
                 vec2 uv = vec2((pLon + 3.1415926) / 6.2831852, (1.5707963 - pLat) / 3.1415926);
                 gl_FragColor = texture2D(t, uv);
@@ -86,7 +84,8 @@ class PanoramaViewer {
         });
         window.addEventListener('pointermove', (e) => {
             if (!this.isUserInteracting) return;
-            // Плавное вращение по осям
+            
+            // Управление в интуитивном инвертированном стиле Google Maps (минус вместо плюс)
             this.lon = this.startLon - (e.clientX - this.startX) * 0.003;
             this.lat = this.startLat - (e.clientY - this.startY) * 0.003;
             this.lat = Math.max(-1.4, Math.min(1.4, this.lat));
@@ -100,8 +99,6 @@ class PanoramaViewer {
         this.canvas.width = this.container.clientWidth;
         this.canvas.height = this.container.clientHeight;
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Вычисляем правильное соотношение сторон экрана ноутбука/смартфона
         this.aspectX = this.canvas.width / this.canvas.height;
         this.aspectY = 1.0;
     }
